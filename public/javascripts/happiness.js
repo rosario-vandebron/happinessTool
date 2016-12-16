@@ -1,22 +1,16 @@
 var sad_canvas = document.getElementById("sad");
 var happy_canvas = document.getElementById("happy");
 var ws = MyWebSocket();
-ws.onopen = function() {
- calculateHappiness(document.getElementById("result"), 0.5);
-};
 
 makeHappiness(sad_canvas, false);
 makeHappiness(happy_canvas, true);
 
-function smile(ctx, level){
+function drawSmile(ctx, level){
   var width = 54
   var x = 95 - width/2
   var hsmooth = 10
   var ysmooth = level*2*hsmooth - hsmooth
   var y = 95 - ysmooth
-//  console.log(ysmooth)
-//  console.log(y)
-
   var h = 20
   var xoff = 10
   var t = 3
@@ -33,31 +27,31 @@ function calculateHappiness(canvas, happinessLevel){
 	var context = canvas.getContext("2d");
 	context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
 	drawBasicCanvas(context);	
-    smile(context, happinessLevel)
+    drawSmile(context, happinessLevel)
 }
 
 function makeHappiness(canvas, isHappy){
 	var context = canvas.getContext("2d");	
 	drawBasicCanvas(context);
-    isHappy ? smile(context, 1) : smile(context, 0)
+    isHappy ? drawSmile(context, 1) : drawSmile(context, 0)
 	context.font = "30px Garamond";
 	happynessStr = isHappy ? "Do u feel happy?"  : "Do u feel sad?"
 	context.fillText(happynessStr,15,175);
 }
 
-//should be 1 (happy) or 0 (sad) for now
 function sendHappiness(happinessLevel){
 	ws.send(happinessLevel);
 }
 
 function MyWebSocket() {
-	if ("WebSocket" in window)
-	{		
-		// Let us open a web socket
+	if ("WebSocket" in window) {
 		var ws = new WebSocket("ws://localhost:9000/ws");
 
-		ws.onmessage = function (evt) 
-		{ 
+        ws.onopen = function() {
+          calculateHappiness(document.getElementById("result"), 0.5);
+        };
+
+		ws.onmessage = function (evt) {
 			var received_msg = evt.data;
 			console.log("Received Message:" + received_msg);
 			var level = JSON.parse(received_msg).level;
@@ -71,9 +65,7 @@ function MyWebSocket() {
 		};
 
 		return ws;
-	}
-	else
-	{
+	} else {
 		alert("WebSocket NOT supported by your Browser!");
 	}
 }
