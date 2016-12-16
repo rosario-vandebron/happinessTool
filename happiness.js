@@ -6,7 +6,7 @@ makeHappiness(sad_canvas, false);
 makeHappiness(happy_canvas, true);
 
 $.get(
-	"http://httpbin.org/get",
+	"http://localhost:9000/smile",
 	function( data ){
 		calculateHappiness(document.getElementById("result"), data.happynessLevel);
 	}
@@ -86,8 +86,7 @@ function makeHappiness(canvas, isHappy){
 
 function sendHappiness(happinessLevel){ //should be 1 (happy) or 0 (sad) for now 
 	$.post( 
-		"http://httpbin.org/post", 
-		{ happynessLevel: happinessLevel }		
+		"http://localhost:9000/smile?level="+happinessLevel, 		
 		).done( function(){
 			alert('Your happiness has been submitted.'+happinessLevel);
 		});
