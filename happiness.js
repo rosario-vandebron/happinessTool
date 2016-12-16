@@ -8,7 +8,7 @@ makeHappiness(happy_canvas, true);
 $.get(
 	"http://localhost:9000/smile",
 	function( data ){
-		calculateHappiness(document.getElementById("result"), data.happynessLevel);
+		calculateHappiness(document.getElementById("result"), data.level);
 	}
 );
 
