@@ -39,7 +39,11 @@ class SmileyController @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implici
     // everything's ok! Let's reply with a JsValue
     futureSmiliesList.map { rates =>
       val length = rates.length
-      val avg = rates.map { r => r.level }.sum / length
+      val avg = length match {
+        case 0 => -1
+        case _ => rates.map { r => r.level }.sum / length
+      }
+
       Ok(Json.toJson(models.Happiness(avg)))
     }
   }
