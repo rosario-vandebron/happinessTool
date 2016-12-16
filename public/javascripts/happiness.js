@@ -8,30 +8,38 @@ ws.onopen = function() {
 makeHappiness(sad_canvas, false);
 makeHappiness(happy_canvas, true);
 
+function smile(ctx, level){
+  var width = 54
+  var x = 95 - width/2
+  var hsmooth = 10
+  var ysmooth = level*2*hsmooth - hsmooth
+  var y = 95 - ysmooth
+//  console.log(ysmooth)
+//  console.log(y)
+
+  var h = 20
+  var xoff = 10
+  var t = 3
+  var yoff = level*2*h - h
+
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.bezierCurveTo(x + xoff, y + yoff, x + width - xoff, y + yoff, x + width, y);
+  ctx.lineWidth = t
+  ctx.stroke();
+}
+
 function calculateHappiness(canvas, happinessLevel){
 	var context = canvas.getContext("2d");
 	context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
 	drawBasicCanvas(context);	
-
-	// Draw the mouth
-	context.beginPath();
-	context.arc(95, 90, 26, (happinessLevel +0.02)*Math.PI, 2*Math.PI, true);
-    context.stroke();	
+    smile(context, happinessLevel)
 }
 
 function makeHappiness(canvas, isHappy){
 	var context = canvas.getContext("2d");	
 	drawBasicCanvas(context);
-
-	// Draw the mouth
-	context.beginPath();
-	if(!isHappy)
-		context.arc(95, 110, 26, Math.PI, 2*Math.PI, false); //sad
-	else
-		context.arc(95, 90, 26, Math.PI, 2*Math.PI, true); // happy
-	
-	context.stroke();
-
+    isHappy ? smile(context, 1) : smile(context, 0)
 	context.font = "30px Garamond";
 	happynessStr = isHappy ? "Do u feel happy?"  : "Do u feel sad?"
 	context.fillText(happynessStr,15,175);
@@ -42,8 +50,7 @@ function sendHappiness(happinessLevel){
 	ws.send(happinessLevel);
 }
 
-function MyWebSocket()
-{
+function MyWebSocket() {
 	if ("WebSocket" in window)
 	{		
 		// Let us open a web socket
