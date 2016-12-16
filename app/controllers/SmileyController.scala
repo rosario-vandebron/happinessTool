@@ -57,19 +57,20 @@ class SmileyController @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implici
     }
   }
 
-  def socket = WebSocket.using[String] { request =>
+  def ws = WebSocket.using[String] { request =>
     val (out, channel) = Concurrent.broadcast[String]
 
     val in = Iteratee.foreach[String] {
       msg =>
         for {
-          collection <- smileyFuture
-          _ <- collection.insert(Smiley(1.0, LocalDateTime.now))
+          collection <- {println(s"Receiving $msg")
+             smileyFuture}
+          _ <- collection.insert(Smiley(msg.toDouble, LocalDateTime.now))
           result <- fetch
         } yield {
           println(result)
           val msg = Json.toJson(result).toString()
-          channel push(msg)
+          channel push msg
         }
     }
     (in,out)

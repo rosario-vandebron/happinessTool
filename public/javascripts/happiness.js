@@ -1,7 +1,7 @@
 // Set up!
 var sad_canvas = document.getElementById("sad");
 var happy_canvas = document.getElementById("happy");
-var ws = WebSocket();
+var ws = MyWebSocket();
 // ws.onopen = function()
 		// {
 		//    // Web Socket is connected, send data using send()
@@ -50,24 +50,24 @@ function sendHappiness(happinessLevel){ //should be 1 (happy) or 0 (sad) for now
 	// 	).done( function(){
 	// 		alert('Your happiness has been submitted.'+happinessLevel);
 	// 	});
-	alert(ws);
-	ws.send(happynessLevel);
+	console.log(ws);
+	ws.send(happinessLevel);
 
 }
 
 
-function WebSocket()
+function MyWebSocket()
 {
 	if ("WebSocket" in window)
 	{		
 		// Let us open a web socket
-		var ws = new WebSocket("ws://echo.websocket.org");
+		var ws = new WebSocket("ws://localhost:9000/ws");
 
 		ws.onmessage = function (evt) 
 		{ 
 			var received_msg = evt.data;
-			console.log("Message is received..."+evt);
-			var level = data.level;
+			console.log("Message is received..."+received_msg);
+			var level = received_msg.level;
 			if (level >= 0)				
 				calculateHappiness(document.getElementById("result"), data.level);			
 
