@@ -20,16 +20,16 @@ class SmileyController @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implici
 
   import Smiley.formatter
 
-  def create(rate: Double) = Action.async {
+  def create(level: Double) = Action.async {
     for {
       cities <- smileyFuture
-      lastError <- cities.insert(Smiley(rate, LocalDateTime.now))
+      lastError <- cities.insert(Smiley(level, LocalDateTime.now))
     } yield
       Ok("Mongo LastError: %s".format(lastError))
   }
 
   def all = Action.async {
-    val query = Json.obj("rate" -> Json.obj("$gt" -> 0))
+    val query = Json.obj("level" -> Json.obj("$gt" -> 0))
     val futureSmiliesList: Future[Seq[Smiley]] = smileyFuture.flatMap {
       _.find(query).
         cursor[Smiley](ReadPreference.primary).
@@ -39,8 +39,8 @@ class SmileyController @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implici
     // everything's ok! Let's reply with a JsValue
     futureSmiliesList.map { rates =>
       val length = rates.length
-      val avg = rates.map { r => r.rate }.sum / length
-      Ok(Json.toJson(avg))
+      val avg = rates.map { r => r.level }.sum / length
+      Ok(Json.toJson(models.Happiness(avg)))
     }
   }
 }
