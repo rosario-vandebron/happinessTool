@@ -57,9 +57,8 @@ class SmileyController @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implici
     }
   }
 
+  val (out, channel) = Concurrent.broadcast[String]
   def ws = WebSocket.using[String] { request =>
-    val (out, channel) = Concurrent.broadcast[String]
-
     val in = Iteratee.foreach[String] {
       msg =>
         for {
