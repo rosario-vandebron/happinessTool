@@ -29,7 +29,7 @@ class SmileyController @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implici
   }
 
   def all = Action.async {
-    val query = Json.obj("level" -> Json.obj("$gt" -> 0))
+    val query = Json.obj("level" -> Json.obj("$gte" -> 0))
     val futureSmiliesList: Future[Seq[Smiley]] = smileyFuture.flatMap {
       _.find(query).
         cursor[Smiley](ReadPreference.primary).
