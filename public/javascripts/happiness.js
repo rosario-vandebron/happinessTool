@@ -34,9 +34,8 @@ function makeHappiness(canvas, isHappy){
 	context.fillText(happynessStr,15,175);
 }
 
-
-function sendHappiness(happinessLevel){ //should be 1 (happy) or 0 (sad) for now 
-	console.log(ws);
+//should be 1 (happy) or 0 (sad) for now
+function sendHappiness(happinessLevel){
 	ws.send(happinessLevel);
 }
 
@@ -50,18 +49,15 @@ function MyWebSocket()
 		ws.onmessage = function (evt) 
 		{ 
 			var received_msg = evt.data;
-			console.log("Message is received..."+received_msg);
+			console.log("Received Message:" + received_msg);
 			var level = JSON.parse(received_msg).level;
-			    console.log(level)
 			if (level >= 0) {
-			    console.log("hello")
 				calculateHappiness(document.getElementById("result"), level);
 			}
 		};
 
 		ws.onclose = function() {
-			// websocket is closed.
-			console.log("Connection is closed..."); 
+			console.log("Connection is closed...");
 		};
 
 		return ws;
