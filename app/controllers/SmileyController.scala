@@ -3,7 +3,8 @@ package controllers
 import java.time.LocalDateTime
 import javax.inject._
 
-import models.Smiley
+import models.{Happiness, Smiley}
+import play.api.libs.iteratee.{Concurrent, Iteratee}
 import play.api.libs.json._
 import play.api.mvc._
 import play.modules.reactivemongo._
@@ -22,13 +23,21 @@ class SmileyController @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implici
 
   def create(level: Double) = Action.async {
     for {
-      cities <- smileyFuture
-      lastError <- cities.insert(Smiley(level, LocalDateTime.now))
+      collection <- smileyFuture
+      result <- collection.insert(Smiley(level, LocalDateTime.now))
     } yield
-      Ok("Mongo LastError: %s".format(lastError))
+      Ok("Mongo: %s".format(result))
   }
 
   def all = Action.async {
+    for {
+      result <- fetch
+    } yield {
+      Ok(Json.toJson(result))
+    }
+  }
+
+  def fetch: Future[Happiness] = {
     val query = Json.obj("level" -> Json.obj("$gte" -> 0))
     val futureSmiliesList: Future[Seq[Smiley]] = smileyFuture.flatMap {
       _.find(query).
@@ -44,9 +53,28 @@ class SmileyController @Inject()(val reactiveMongoApi: ReactiveMongoApi)(implici
         case _ => rates.map { r => r.level }.sum / length
       }
 
-      Ok(Json.toJson(models.Happiness(avg)))
+      models.Happiness(avg)
     }
   }
+
+  def socket = WebSocket.using[String] { request =>
+    val (out, channel) = Concurrent.broadcast[String]
+
+    val in = Iteratee.foreach[String] {
+      msg =>
+        for {
+          collection <- smileyFuture
+          _ <- collection.insert(Smiley(1.0, LocalDateTime.now))
+          result <- fetch
+        } yield {
+          println(result)
+          val msg = Json.toJson(result).toString()
+          channel push(msg)
+        }
+    }
+    (in,out)
+  }
+
 }
 
 
