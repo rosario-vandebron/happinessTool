@@ -1,6 +1,9 @@
 var sad_canvas = document.getElementById("sad");
 var happy_canvas = document.getElementById("happy");
 var ws = MyWebSocket();
+ws.onopen = function() {
+ calculateHappiness(document.getElementById("result"), 0.5);
+};
 
 makeHappiness(sad_canvas, false);
 makeHappiness(happy_canvas, true);
