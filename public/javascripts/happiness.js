@@ -1,27 +1,19 @@
-// Set up!
 var sad_canvas = document.getElementById("sad");
 var happy_canvas = document.getElementById("happy");
 var ws = MyWebSocket();
-// ws.onopen = function()
-		// {
-		//    // Web Socket is connected, send data using send()
-		//    ws.send("Message to send");
-		//    alert("Message is sent...");
-		// };		
 
 makeHappiness(sad_canvas, false);
 makeHappiness(happy_canvas, true);
 
-function calculateHappiness(canvas, happynessLevel){
+function calculateHappiness(canvas, happinessLevel){
 	var context = canvas.getContext("2d");
 	context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
 	drawBasicCanvas(context);	
 
 	// Draw the mouth
 	context.beginPath();
-	context.arc(95, 90, 26, (happynessLevel +0.02)*Math.PI, 2*Math.PI, true);	
+	context.arc(95, 90, 26, (happinessLevel +0.02)*Math.PI, 2*Math.PI, true);
     context.stroke();	
-
 }
 
 function makeHappiness(canvas, isHappy){
@@ -37,7 +29,6 @@ function makeHappiness(canvas, isHappy){
 	
 	context.stroke();
 
-	// Write "Hello, World!"
 	context.font = "30px Garamond";
 	happynessStr = isHappy ? "Do u feel happy?"  : "Do u feel sad?"
 	context.fillText(happynessStr,15,175);
@@ -45,16 +36,9 @@ function makeHappiness(canvas, isHappy){
 
 
 function sendHappiness(happinessLevel){ //should be 1 (happy) or 0 (sad) for now 
-	// $.post( 
-	// 	"http://localhost:9000/smile?level="+happinessLevel
-	// 	).done( function(){
-	// 		alert('Your happiness has been submitted.'+happinessLevel);
-	// 	});
 	console.log(ws);
 	ws.send(happinessLevel);
-
 }
-
 
 function MyWebSocket()
 {
@@ -67,14 +51,15 @@ function MyWebSocket()
 		{ 
 			var received_msg = evt.data;
 			console.log("Message is received..."+received_msg);
-			var level = received_msg.level;
-			if (level >= 0)				
-				calculateHappiness(document.getElementById("result"), data.level);			
-
+			var level = JSON.parse(received_msg).level;
+			    console.log(level)
+			if (level >= 0) {
+			    console.log("hello")
+				calculateHappiness(document.getElementById("result"), level);
+			}
 		};
 
-		ws.onclose = function()
-		{ 
+		ws.onclose = function() {
 			// websocket is closed.
 			console.log("Connection is closed..."); 
 		};
@@ -83,7 +68,6 @@ function MyWebSocket()
 	}
 	else
 	{
-		// The browser doesn't support WebSocket
 		alert("WebSocket NOT supported by your Browser!");
 	}
 }
