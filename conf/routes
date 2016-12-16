@@ -3,7 +3,8 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
+GET     /                          controllers.HomeController.index
+GET     /dashboard                 controllers.HomeController.dashboard
 
 POST     /smile                    controllers.SmileyController.create(level: Double)
 GET      /smile                    controllers.SmileyController.all()
